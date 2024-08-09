@@ -24,6 +24,8 @@ export function Currency() {
       setConverted(data.rates[toCurrency].toFixed(2))
     }
 
+    if (fromCurrency === toCurrency) return setConverted(amount)
+
     converterAPI()
   }, [amount, fromCurrency, toCurrency])
 
