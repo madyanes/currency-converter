@@ -21,7 +21,7 @@ export function Currency() {
         `https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`
       )
       const data = await response.json()
-      setConverted(data.rates[toCurrency])
+      setConverted(data.rates[toCurrency].toFixed(2))
     }
 
     converterAPI()
@@ -32,7 +32,9 @@ export function Currency() {
       <h1>Currency Converter</h1>
       <CurrencyForm
         amount={amount}
+        onAmountChange={(e) => setAmount(e.target.value ? e.target.value : 1)}
         fromCurrency={fromCurrency}
+        onFromCurrencyChange={(e) => setFromCurrency(e.target.value)}
         toCurrency={toCurrency}
         onToCurrencyChange={(e) => {
           setToCurrency(e.target.value)
@@ -45,7 +47,9 @@ export function Currency() {
 
 export function CurrencyForm({
   amount,
+  onAmountChange,
   fromCurrency,
+  onFromCurrencyChange,
   toCurrency,
   onToCurrencyChange,
   converted,
@@ -53,28 +57,30 @@ export function CurrencyForm({
   return (
     <div>
       <form className='currency-form' onSubmit={(e) => e.preventDefault()}>
-        <CurrencyInput />
+        <CurrencyInput
+          value={{ state: amount, setState: onAmountChange }}
+          result={{ state: fromCurrency, setState: onFromCurrencyChange }}
+        />
         <CurrencyInput
           disabled
-          converted={converted}
-          toCurrency={toCurrency}
-          onToCurrencyChange={onToCurrencyChange}
+          value={{ state: converted }}
+          result={{ state: toCurrency, setState: onToCurrencyChange }}
         />
       </form>
     </div>
   )
 }
 
-export function CurrencyInput({
-  disabled,
-  converted,
-  toCurrency,
-  onToCurrencyChange,
-}) {
+export function CurrencyInput({ disabled, value, result }) {
   return (
     <div className='currency-input'>
-      <input type='text' value={converted} disabled={disabled} />
-      <select name='' id='' value={toCurrency} onChange={onToCurrencyChange}>
+      <input
+        type='text'
+        value={value.state}
+        disabled={disabled}
+        onChange={value.setState}
+      />
+      <select name='' id='' value={result?.state} onChange={result?.setState}>
         <option value='IDR'>IDR</option>
         <option value='USD'>USD</option>
         <option value='JPY'>JPY</option>
